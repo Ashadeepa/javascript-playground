@@ -1,0 +1,16 @@
+{
+  "name": "javascript-playground",
+  "version": "1.0.0",
+  "description": "A simple hello world JavaScript repository",
+  "main": "hello.js",
+  "scripts": {
+    "start": "node hello.js"
+  },
+  "keywords": [
+    "hello-world",
+    "javascript",
+    "playground"
+  ],
+  "author": "",
+  "license": "MIT"
+}
