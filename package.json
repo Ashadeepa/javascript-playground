@@ -1,16 +1,33 @@
 {
-  "name": "javascript-playground",
+  "name": "threejs-workshop",
   "version": "1.0.0",
-  "description": "A simple hello world JavaScript repository",
-  "main": "hello.js",
+  "type": "module",
+  "description": "A comprehensive Three.js workshop with progressive examples",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
   "scripts": {
-    "start": "node hello.js"
+    "dev": "vite",
+    "serve": "python3 -m http.server 8000",
+    "serve-alt": "python -m SimpleHTTPServer 8000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "hello-world",
-    "javascript",
-    "playground"
+    "threejs",
+    "3d",
+    "webgl",
+    "workshop",
+    "tutorial"
   ],
-  "author": "",
-  "license": "MIT"
+  "author": "Workshop Instructor",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.181.0"
+  },
+  "devDependencies": {
+    "vite": "^4.5.3"
+  }
 }
