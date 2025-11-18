@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Product Visualization - Three.js Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .controls-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+            max-width: 320px;
+        }
+
+        .controls-panel h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid #3498db;
+        }
+
+        .section h3 {
+            color: #ecf0f1;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            color: #bdc3c7;
+            margin-bottom: 6px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 13px;
+        }
+
+        .control-group input[type="range"] {
+            padding: 0;
+            height: 25px;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+
+        .color-option.active {
+            border-color: #3498db;
+            transform: scale(1.1);
+        }
+
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .material-option {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 11px;
+            pointer-events: auto;
+        }
+
+        .material-option.active {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .animation-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            pointer-events: auto;
+            max-width: 280px;
+        }
+
+        .product-info h2 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .product-specs {
+            list-style: none;
+            font-size: 12px;
+        }
+
+        .product-specs li {
+            margin-bottom: 6px;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(46, 204, 113, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+            max-width: 350px;
+        }
+
+        .instructions h4 {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .instruction-list {
+            list-style: none;
+            font-size: 11px;
+        }
+
+        .instruction-list li {
+            margin-bottom: 3px;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .instruction-list li:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .controls-panel,
+            .product-info {
+                position: relative;
+                max-width: none;
+                margin: 10px;
+            }
+
+            .instructions {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <div class="ui-overlay">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading 3D Model...</p>
+        </div>
+
+        <div class="controls-panel" id="controls" style="display: none;">
+            <h2>🎮 Product Controls</h2>
+
+            <div class="section">
+                <h3>🎨 Material & Color</h3>
+                <div class="control-group">
+                    <label>Material Type:</label>
+                    <div class="material-grid">
+                        <div class="material-option active" data-material="standard">Standard</div>
+                        <div class="material-option" data-material="metallic">Metallic</div>
+                        <div class="material-option" data-material="glass">Glass</div>
+                        <div class="material-option" data-material="plastic">Plastic</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Product Colors:</label>
+                    <div class="color-grid">
+                        <div class="color-option active" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                        <div class="color-option" style="background: #3498db;" data-color="#3498db"></div>
+                        <div class="color-option" style="background: #2ecc71;" data-color="#2ecc71"></div>
+                        <div class="color-option" style="background: #f39c12;" data-color="#f39c12"></div>
+                        <div class="color-option" style="background: #9b59b6;" data-color="#9b59b6"></div>
+                        <div class="color-option" style="background: #1abc9c;" data-color="#1abc9c"></div>
+                        <div class="color-option" style="background: #34495e;" data-color="#34495e"></div>
+                        <div class="color-option" style="background: #ffffff;" data-color="#ffffff"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>💡 Lighting</h3>
+                <div class="control-group">
+                    <label for="lightIntensity">Main Light: <span id="lightValue">1.0</span></label>
+                    <input type="range" id="lightIntensity" min="0" max="3" step="0.1" value="1.0">
+                </div>
+                <div class="control-group">
+                    <label for="ambientLight">Ambient: <span id="ambientValue">0.3</span></label>
+                    <input type="range" id="ambientLight" min="0" max="1" step="0.1" value="0.3">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="product-info" id="productInfo" style="display: none;">
+            <h2>📱 Product Details</h2>
+            <ul class="product-specs">
+                <li><span>Model:</span> <span>Smartphone Pro X</span></li>
+                <li><span>Price:</span> <span>$899</span></li>
+                <li><span>Display:</span> <span>6.7" OLED</span></li>
+                <li><span>Storage:</span> <span>256GB</span></li>
+                <li><span>Camera:</span> <span>108MP Triple</span></li>
+                <li><span>Battery:</span> <span>4500mAh</span></li>
+                <li><span>5G:</span> <span>Yes</span></li>
+                <li><span>Colors:</span> <span id="currentColor">Red</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Three.js and OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // Global variables
+        let scene, camera, renderer, controls;
+        let productMesh, productGroup;
+        let currentMaterial = 'standard';
+        let isAnimating = true;
+        let animationSpeed = 1.0;
+
+        // Lighting
+        let ambientLight, directionalLight, pointLight1, pointLight2;
+
+        // Colors mapping
+        const colorNames = {
+            '#e74c3c': 'Red',
+            '#3498db': 'Blue',
+            '#2ecc71': 'Green',
+            '#f39c12': 'Orange',
+            '#9b59b6': 'Purple',
+            '#1abc9c': 'Teal',
+            '#34495e': 'Dark Gray',
+            '#ffffff': 'White'
+        };
+
+        function init() {
+            // Create scene -- 1st 
+            //scene = new THREE.Scene();
+            //scene.background = new THREE.Color(0x2c3e50);
+
+            // Create camera -2nd
+            /*camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 0, 5);*/
+
+            // Create renderer --3rd
+            /*renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.physicallyCorrectLights = true;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);*/
+
+            // Add orbit controls --4th
+            /*controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 2;
+            controls.maxDistance = 10;
+            controls.maxPolarAngle = Math.PI;*/
+
+            // Setup lighting --5th
+            //setupLighting();
+
+            // Create product --6th
+            //createProduct();
+
+            // Setup event listeners
+            //setupEventListeners();
+
+            // Hide loading and show UI
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('controls').style.display = 'block';
+                document.getElementById('productInfo').style.display = 'block';
+            }, 1500);
+
+            // Start animation
+            animate();
+        }
+
+        function setupLighting() {
+            // Ambient light
+            ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+
+            // Main directional light
+            directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+
+            // Point lights for rim lighting
+            pointLight1 = new THREE.PointLight(0x3498db, 0.5, 10);
+            pointLight1.position.set(-3, 2, 2);
+            scene.add(pointLight1);
+
+            pointLight2 = new THREE.PointLight(0xe74c3c, 0.3, 8);
+            pointLight2.position.set(3, -2, -2);
+            scene.add(pointLight2);
+        }
+
+        function createProduct() {
+            productGroup = new THREE.Group();
+
+            // Main phone body
+            const phoneGeometry = new THREE.BoxGeometry(1.5, 3, 0.2);
+
+            productMesh = new THREE.Mesh(
+                phoneGeometry,
+                createMaterial(currentMaterial, '#e74c3c')
+            );
+            productMesh.castShadow = true;
+            productMesh.receiveShadow = true;
+
+            // Screen (slightly inset)
+            /*const screenGeometry = new THREE.BoxGeometry(1.3, 2.6, 0.01);
+            const screenMaterial = new THREE.MeshPhongMaterial({
+                color: 0x000000,
+                shininess: 100
+            });
+            const screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
+            screenMesh.position.z = 0.105;*/
+
+            // Camera bump
+            /*const cameraGeometry = new THREE.BoxGeometry(0.8, 0.4, 0.05);
+            const cameraMaterial = new THREE.MeshPhongMaterial({
+                color: 0x2c3e50,
+                shininess: 80
+            });
+            const cameraMesh = new THREE.Mesh(cameraGeometry, cameraMaterial);
+            cameraMesh.position.set(0, 1.2, -0.125);*/
+
+            // Camera lenses
+            /*const lensGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.03, 16);
+            const lensMaterial = new THREE.MeshPhongMaterial({
+                color: 0x1a1a1a,
+                shininess: 200
+            });
+
+            for (let i = 0; i < 3; i++) {
+                const lensMesh = new THREE.Mesh(lensGeometry, lensMaterial);
+                lensMesh.position.set(-0.25 + i * 0.25, 1.2, -0.11);
+                lensMesh.rotation.x = Math.PI / 2;
+                productGroup.add(lensMesh);
+            }*/
+
+            // Home button
+            /*const buttonGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.01, 16);
+            const buttonMaterial = new THREE.MeshPhongMaterial({
+                color: 0x34495e,
+                shininess: 100
+            });
+            const buttonMesh = new THREE.Mesh(buttonGeometry, buttonMaterial);
+            buttonMesh.position.set(0, -1.2, 0.105);
+            buttonMesh.rotation.x = Math.PI / 2;*/
+
+            // Add all parts to group
+            productGroup.add(productMesh);
+            //productGroup.add(screenMesh);
+            //productGroup.add(cameraMesh);
+            //productGroup.add(buttonMesh);
+
+            // Add ground plane for shadows
+            /*const groundGeometry = new THREE.PlaneGeometry(20, 20);
+            const groundMaterial = new THREE.MeshLambertMaterial({
+                color: 0x2c3e50,
+                opacity: 0.5,
+                transparent: true
+            });
+            const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+            groundMesh.rotation.x = -Math.PI / 2;
+            groundMesh.position.y = -2;
+            groundMesh.receiveShadow = true;*/
+
+            scene.add(productGroup);
+            //scene.add(groundMesh);
+        }
+
+        function createMaterial(type, color) {
+            const hexColor = new THREE.Color(color);
+
+            switch (type) {
+                case 'metallic':
+                    return new THREE.MeshStandardMaterial({
+                        color: hexColor,
+                        metalness: 0.8,
+                        roughness: 0.2
+                    });
+                case 'glass':
+                    return new THREE.MeshPhysicalMaterial({
+                        color: hexColor,
+                        transmission: 0.9,
+                        opacity: 0.3,
+                        transparent: true,
+                        roughness: 0.05,
+                        thickness: 0.5
+                    });
+                case 'plastic':
+                    return new THREE.MeshPhongMaterial({
+                        color: hexColor,
+                        shininess: 150,
+                        specular: 0x222222
+                    });
+                case 'standard':
+                default:
+                    return new THREE.MeshPhongMaterial({
+                        color: hexColor,
+                        shininess: 100
+                    });
+            }
+        }
+
+        function setupEventListeners() {
+            // Window resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Color selection
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+
+                    // Change product color
+                    const color = option.dataset.color;
+                    changeProductColor(color);
+
+                    // Update color name in specs
+                    document.getElementById('currentColor').textContent = colorNames[color];
+                });
+            });
+
+            // Material selection
+            document.querySelectorAll('.material-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.material-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+
+                    // Change material
+                    currentMaterial = option.dataset.material;
+                    const currentColor = document.querySelector('.color-option.active').dataset.color;
+                    changeProductColor(currentColor);
+                });
+            });
+
+            // Light controls
+            document.getElementById('lightIntensity').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('lightValue').textContent = value.toFixed(1);
+                directionalLight.intensity = value;
+            });
+
+            document.getElementById('ambientLight').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                document.getElementById('ambientValue').textContent = value.toFixed(1);
+                ambientLight.intensity = value;
+            })
+        }
+
+        function changeProductColor(color) {
+            productMesh.material = createMaterial(currentMaterial, color);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Auto rotation
+            if (isAnimating) {
+                productGroup && (productGroup.rotation.y += 0.01 * animationSpeed);
+            }
+
+            // Update controls
+            controls && controls.update();
+
+            // Animate point lights
+            const time = Date.now() * 0.001;
+            pointLight1 && (pointLight1.position.x = Math.cos(time) * 3);
+            pointLight1 && (pointLight1.position.z = Math.sin(time) * 3);
+
+            pointLight2 && (pointLight2.position.x = Math.cos(time + Math.PI) * 2);
+            pointLight2 && (pointLight2.position.z = Math.sin(time + Math.PI) * 2);
+
+            // Render
+            renderer && renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer && renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+
+</html>

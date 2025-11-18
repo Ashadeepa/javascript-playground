@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 1: Rotating Cube - Three.js Workshop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 400px;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-panel h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+
+        .info-panel p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .info-panel ul {
+            color: #666;
+            padding-left: 20px;
+        }
+
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 100;
+            font-size: 14px;
+        }
+
+        .back-button:hover {
+            background: #0056b3;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="info-panel">
+        <h3>🎯 Demo 1: Rotating Cube</h3>
+        <p><strong>Learning Objectives:</strong></p>
+        <ul>
+            <li>Create a basic 3D scene</li>
+            <li>Add geometry and materials</li>
+            <li>Implement smooth animation</li>
+        </ul>
+        <p><strong>Key Concepts:</strong> Scene, Camera, Renderer, Mesh, Animation Loop</p>
+    </div>
+
+    <a href="../index.html" class="back-button">← Back to Workshop</a>
+
+    <div id="canvas-container"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        //1st
+        //const scene = new THREE.Scene();
+        //scene.background = new THREE.Color(0xffffff);
+
+        //2nd
+        /*const camera = new THREE.PerspectiveCamera(
+            45,                                    // Field of view in degrees (wider = more visible)
+            window.innerWidth / window.innerHeight, // Aspect ratio (width/height)
+            0.1,                                   // Near clipping plane (closest visible distance)
+            1000                                   // Far clipping plane (farthest visible distance)
+        );*/
+
+        //3rd
+        /*const renderer = new THREE.WebGLRenderer({
+            antialias: true // Smooth edges for better quality
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);*/
+
+        // 4th
+        //document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        //5th
+        //const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+
+        // 6th
+        /*const cubeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x00ff88,    // Green color (hex format)
+            roughness: 0.3,     // How rough/smooth the surface is (0 = mirror, 1 = matte)
+            metalness: 0.1,     // How metallic it looks (0 = plastic, 1 = metal)
+            wireframe: false    // Set to true to see just the wireframe
+        });*/
+
+        // 7th
+        //const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+        // 8th
+        //cube.castShadow = true;
+
+        // 9th
+        //scene.add(cube);
+
+        // =================================================================
+        // 10th
+        // =================================================================
+
+        /*
+        // Add ambient light - provides base illumination to all objects
+        // This prevents objects from being completely black in shadowed areas
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4); // Color, intensity
+        scene.add(ambientLight);
+
+        // Add directional light - like sunlight, comes from one direction
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5); // Position the light
+        directionalLight.castShadow = true;     // Enable shadow casting
+
+        // Configure shadow settings for better quality
+        directionalLight.shadow.mapSize.width = 2048;  // Shadow resolution
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 50;
+
+        scene.add(directionalLight);
+        */
+
+        // =================================================================
+        // 11th
+        // =================================================================
+
+        /*
+        // Move the camera back so we can see the cube
+        camera.position.z = 5;
+        camera.position.y = 2;
+        camera.position.x = 2;
+
+        // Point the camera at the cube (at origin 0,0,0)
+        camera.lookAt(0, 0, 0);
+        */
+
+        let animationRunning = true;  // Control whether animation is active
+        let rotationSpeed = 1.0;      // Speed multiplier for rotation
+
+        // =================================================================
+        // 12th
+        // =================================================================
+
+        function animate() {
+            //14th
+            /*
+            // Request the next frame - this creates a smooth 60fps loop
+            requestAnimationFrame(animate);
+
+            // Only animate if animation is enabled
+            if (animationRunning) {
+                // Rotate the cube around different axes
+                // Adding small values each frame creates smooth motion
+                cube.rotation.x += 0.01 * rotationSpeed; // Rotate around X-axis
+                cube.rotation.y += 0.02 * rotationSpeed; // Rotate around Y-axis (faster)
+                cube.rotation.z += 0.005 * rotationSpeed; // Rotate around Z-axis (slower)
+            }*/
+
+
+            // 13th
+            //renderer.render(scene, camera);
+        }
+
+        // =================================================================
+        // STEP 9: START THE APPLICATION
+        // =================================================================
+
+        // Begin the animation loop
+        animate();
+    </script>
+</body>
+
+</html>
